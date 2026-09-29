@@ -1,0 +1,22 @@
+# dependencies
+node_modules/
+
+# build
+dist/
+*.tsbuildinfo
+
+# prisma client 
+src/generated/
+
+# env
+.env
+.env.*
+!.env.example
+
+# logs / os / ide
+*.log
+coverage/
+.DS_Store
+.idea/
+.vscode/
+.vercel
