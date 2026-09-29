@@ -1,0 +1,215 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Profile {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  slug        String   @unique @db.VarChar(64)
+  firstName   String   @map("first_name") @db.VarChar(100)
+  lastName    String   @map("last_name") @db.VarChar(100)
+  middleName  String?  @map("middle_name") @db.VarChar(100)
+  headline    String   @db.VarChar(150)
+  description String   @db.Text
+  location    String?  @db.VarChar(150)
+  email       String?  @db.VarChar(254)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  isDeleted   Boolean  @default(false) @map("is_deleted")
+
+  links       ProfileLink[]
+  skills      ProfileSkill[]
+  experiences Experience[]
+  projects    Project[]
+
+  @@map("profiles")
+}
+
+model ResourceType {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  code      String   @unique @db.VarChar(32)
+  name      String   @db.VarChar(100)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  isDeleted Boolean  @default(false) @map("is_deleted")
+
+  links ProfileLink[]
+
+  @@map("resource_types")
+}
+
+model ProfileLink {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  profileId      String   @map("profile_id") @db.Uuid
+  resourceTypeId String   @map("resource_type_id") @db.Uuid
+  url            String   @db.VarChar(2048)
+  sortOrder      Int      @default(0) @map("sort_order")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  isDeleted      Boolean  @default(false) @map("is_deleted")
+
+  profile      Profile      @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  resourceType ResourceType @relation(fields: [resourceTypeId], references: [id], onDelete: Restrict)
+
+  @@unique([profileId, url])
+  @@index([resourceTypeId])
+  @@map("profile_links")
+}
+
+model SkillCategory {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  code      String   @unique @db.VarChar(32)
+  name      String   @db.VarChar(100)
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  isDeleted Boolean  @default(false) @map("is_deleted")
+
+  skills Skill[]
+
+  @@map("skill_categories")
+}
+
+model Skill {
+  id         String   @id @default(uuid(7)) @db.Uuid
+  name       String   @unique @db.VarChar(100)
+  categoryId String   @map("category_id") @db.Uuid
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  isDeleted  Boolean  @default(false) @map("is_deleted")
+
+  category    SkillCategory     @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  profiles    ProfileSkill[]
+  experiences ExperienceSkill[]
+  projects    ProjectSkill[]
+
+  @@index([categoryId])
+  @@map("skills")
+}
+
+model ProfileSkill {
+  profileId String   @map("profile_id") @db.Uuid
+  skillId   String   @map("skill_id") @db.Uuid
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  isDeleted Boolean  @default(false) @map("is_deleted")
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  skill   Skill   @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([profileId, skillId])
+  @@index([skillId])
+  @@map("profile_skills")
+}
+
+model Company {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  name      String   @unique @db.VarChar(200)
+  city      String?  @db.VarChar(100)
+  website   String?  @db.VarChar(2048)
+  industry  String?  @db.VarChar(200)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  isDeleted Boolean  @default(false) @map("is_deleted")
+
+  experiences Experience[]
+
+  @@map("companies")
+}
+
+model Experience {
+  id          String    @id @default(uuid(7)) @db.Uuid
+  profileId   String    @map("profile_id") @db.Uuid
+  companyId   String    @map("company_id") @db.Uuid
+  position    String    @db.VarChar(150)
+  startDate   DateTime  @map("start_date") @db.Date
+ 
+  endDate     DateTime? @map("end_date") @db.Date
+  description String?   @db.Text
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  isDeleted   Boolean   @default(false) @map("is_deleted")
+
+  profile      Profile                 @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  company      Company                 @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  achievements ExperienceAchievement[]
+  skills       ExperienceSkill[]
+
+  @@unique([profileId, companyId, startDate])
+  @@index([companyId])
+  @@map("experiences")
+}
+
+model ExperienceAchievement {
+  id           String   @id @default(uuid(7)) @db.Uuid
+  experienceId String   @map("experience_id") @db.Uuid
+  description  String   @db.Text
+  sortOrder    Int      @default(0) @map("sort_order")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  isDeleted    Boolean  @default(false) @map("is_deleted")
+
+  experience Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+
+  @@unique([experienceId, sortOrder])
+  @@map("experience_achievements")
+}
+
+model ExperienceSkill {
+  experienceId String   @map("experience_id") @db.Uuid
+  skillId      String   @map("skill_id") @db.Uuid
+  sortOrder    Int      @default(0) @map("sort_order")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  isDeleted    Boolean  @default(false) @map("is_deleted")
+
+  experience Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  skill      Skill      @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([experienceId, skillId])
+  @@index([skillId])
+  @@map("experience_skills")
+}
+
+model Project {
+  id            String   @id @default(uuid(7)) @db.Uuid
+  profileId     String   @map("profile_id") @db.Uuid
+  slug          String   @db.VarChar(64)
+  name          String   @db.VarChar(200)
+  description   String?  @db.Text
+  url           String?  @db.VarChar(2048)
+  repositoryUrl String?  @map("repository_url") @db.VarChar(2048)
+  sortOrder     Int      @default(0) @map("sort_order")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  isDeleted     Boolean  @default(false) @map("is_deleted")
+
+  profile Profile        @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  skills  ProjectSkill[]
+
+  @@unique([profileId, slug])
+  @@map("projects")
+}
+
+model ProjectSkill {
+  projectId String   @map("project_id") @db.Uuid
+  skillId   String   @map("skill_id") @db.Uuid
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  isDeleted Boolean  @default(false) @map("is_deleted")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  skill   Skill   @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, skillId])
+  @@index([skillId])
+  @@map("project_skills")
+}
