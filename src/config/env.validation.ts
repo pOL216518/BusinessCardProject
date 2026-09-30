@@ -28,7 +28,7 @@ export function validateEnv(
   });
 
   if (error) {
-    throw new Error(`Invalid environment configuration: ${error.message}`);
+    throw new Error(`Некорректная конфигурация окружения: ${error.message}`);
   }
 
   return value;

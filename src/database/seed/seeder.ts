@@ -212,7 +212,7 @@ function parseYearMonth(value: YearMonth): Date {
 function requireId(ids: IdByKey, key: string, entity: string): string {
   const id = ids.get(key);
   if (!id) {
-    throw new Error(`Seed data references unknown ${entity}: "${key}"`);
+    throw new Error(`Данные ссылаются на неизвестную сущность ${entity}: "${key}"`);
   }
   return id;
 }

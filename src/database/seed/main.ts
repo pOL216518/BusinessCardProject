@@ -18,13 +18,13 @@ async function main(): Promise<void> {
     await prisma.$transaction((tx) => new Seeder(tx).run(seedData), {
       timeout: 60_000,
     });
-    console.log(`Seed completed for profile "${seedData.profile.slug}"`);
+    console.log(`Успешное заполнения данных для профиля "${seedData.profile.slug}"`);
   } finally {
     await prisma.$disconnect();
   }
 }
 
 main().catch((error: unknown) => {
-  console.error('Seed failed:', error);
+  console.error('Ошибка при заполнении данных:', error);
   process.exit(1);
 });
