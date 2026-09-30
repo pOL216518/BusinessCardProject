@@ -7,6 +7,18 @@ services:
       POSTGRES_DB: cv
     ports:
       - '5433:5432'
+      api:
+    build: .
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://cv:cv@db:5432/cv?schema=public
+      DEFAULT_PROFILE_SLUG: evgeny-ershov
+    ports:
+      - '3000:3000'
+    depends_on:
+      db:
+        condition: service_healthy
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:

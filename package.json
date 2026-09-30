@@ -20,7 +20,8 @@
     "db:deploy": "prisma migrate deploy",
     "db:seed": "node dist/database/seed/main.js",
     "db:seed:dev": "tsx src/database/seed/main.ts",
-    "db:setup": "npm run db:deploy && npm run db:seed"
+    "db:setup": "npm run db:deploy && npm run db:seed",
+    "vercel-build": "prisma generate && prisma migrate deploy && nest build && npm run db:seed"
   },
   "dependencies": {
     "@apollo/server": "^5.5.1",
