@@ -25,7 +25,8 @@ import { DataLoaderModule } from './dataloader/dataloader.module.js';
         return {
           // В деве пишем схему в файл — удобно глянуть в ревью
           // В проде — только в память, иначе Vercel ругнётся, ФС там readonly.
-          autoSchemaFile: isProduction
+          autoSchemaFile: 
+           isProduction || process.env.VERCEL
             ? true
             : join(process.cwd(), 'schema.gql'),
           sortSchema: true,
