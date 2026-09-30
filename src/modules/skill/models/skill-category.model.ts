@@ -5,7 +5,7 @@ export class SkillCategoryModel {
   @Field(() => ID)
   id: string;
 
-  @Field({ description: 'Машинный код категории, например BACKEND' })
+  @Field({ description: 'Код категории, например BACKEND' })
   code: string;
 
   @Field()

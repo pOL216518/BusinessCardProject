@@ -1,0 +1,138 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Company {
+  city: String
+  id: ID!
+  industry: String
+  name: String!
+  website: String
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+"""Продолжительность с точностью до месяца"""
+type Duration {
+  """Остаток месяцев сверх полных лет"""
+  months: Int!
+
+  """Человекочитаемо, например «2 года 4 месяца»"""
+  text: String!
+  totalMonths: Int!
+  years: Int!
+}
+
+"""Место работы"""
+type Experience {
+  achievements: [String!]!
+
+  """Название компании"""
+  company: String!
+
+  """Подробная информация о компании"""
+  companyInfo: Company!
+  description: String
+  id: ID!
+  period: Period!
+  position: String!
+
+  """Технологии, использованные на этом месте работы"""
+  technologies: [Skill!]!
+}
+
+"""Период работы"""
+type Period {
+  duration: Duration!
+
+  """null — по настоящее время"""
+  endDate: DateTime
+  isCurrent: Boolean!
+  startDate: DateTime!
+
+  """Например «июнь 2024 — июль 2026»"""
+  text: String!
+}
+
+"""Профиль специалиста"""
+type Profile {
+  """Краткое описание"""
+  description: String!
+  email: String
+
+  """Опыт работы, от нового к старому"""
+  experience: [Experience!]!
+  firstName: String!
+
+  """Желаемая должность, например «Fullstack-разработчик»"""
+  headline: String!
+  id: ID!
+  lastName: String!
+  links: [ProfileLink!]!
+  location: String
+  middleName: String
+
+  """Имя и фамилия"""
+  name: String!
+  projects: [Project!]!
+  skills: [Skill!]!
+  slug: String!
+
+  """Общий стаж без учёта пересечений"""
+  totalExperience: Duration!
+}
+
+"""Ссылка на GitHub, LinkedIn и т.п."""
+type ProfileLink {
+  id: ID!
+  resourceType: ResourceType!
+  url: String!
+}
+
+type Project {
+  description: String
+  id: ID!
+  name: String!
+
+  """Ссылка на репозиторий"""
+  repositoryUrl: String
+  slug: String!
+
+  """Стек проекта"""
+  technologies: [Skill!]!
+
+  """Ссылка на работающий проект"""
+  url: String
+}
+
+type Query {
+  """Профиль по slug; без аргумента — профиль владельца визитки"""
+  profile(slug: String): Profile
+}
+
+"""Тип профессионального ресурса"""
+type ResourceType {
+  """Например GITHUB, LINKEDIN"""
+  code: String!
+  id: ID!
+  name: String!
+}
+
+"""Навык или технология"""
+type Skill {
+  """Резолвится через DataLoader"""
+  category: SkillCategoryModel!
+  id: ID!
+  name: String!
+}
+
+"""Категория навыков (Backend, Frontend, ...)"""
+type SkillCategoryModel {
+  """Код категории, например BACKEND"""
+  code: String!
+  id: ID!
+  name: String!
+}
