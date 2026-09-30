@@ -16,4 +16,4 @@ async function bootstrap() {
 
   Logger.log(`GraphQL Sandbox: http://localhost:${port}/graphql`, 'Bootstrap');
 }
-await bootstrap();
+void bootstrap();
